@@ -1,0 +1,81 @@
+{
+    "terraform": {
+        "required_providers": {
+            "vsphere": {
+                "source": "local/hashicorp/vsphere",
+                "version": "2.3.1"
+            }
+        }
+    },
+    "provider": {
+        "vsphere": {
+            "vsphere_server": "xx.xx.xx.xx",
+            "user": "user@domain",
+            "password": "xxxx",
+            "allow_unverified_ssl": "true"
+        }
+    },
+    "data": {
+        "vsphere_datacenter": {
+            "dc": {
+                "name": "XXX-YourDatacentername-XXX"
+            }
+        },
+        "vsphere_resource_pool": {
+            "pool": {
+                "name": "<Cluster>/Resources",
+                "datacenter_id": "${data.vsphere_datacenter.dc.id}"
+            }
+        },
+        "vsphere_datastore": {
+            "datastore": {
+                "name": "<Datastore name where VM resides>",
+                "datacenter_id": "${data.vsphere_datacenter.dc.id}"
+            }
+        },
+        "vsphere_network": {
+            "network0": {
+                "name": "VM Network",
+                "datacenter_id": "${data.vsphere_datacenter.dc.id}"
+            }
+        }
+    },
+    "resource": {
+        "vsphere_virtual_machine": {
+            "VMresource": {
+                "network_interface": {
+                    "adapter_type": "vmxnet3",
+                    "network_id": "${data.vsphere_network.network0.id}"
+                },
+                "name": "UbantuTest",
+                "resource_pool_id": "${data.vsphere_resource_pool.pool.id}",
+                "datastore_id": "${data.vsphere_datastore.datastore.id}",
+                "boot_retry_enabled": false,
+                "enable_disk_uuid": false,
+                "enable_logging": false,
+                "num_cores_per_socket": 1,
+                "num_cpus": 3,
+                "guest_id": "ubuntu64Guest",
+                "memory": 12288,
+                "cpu_hot_add_enabled": "true",
+                "memory_hot_add_enabled": "true",
+                "firmware": "bios",
+                "scsi_type": "${data.vsphere_virtual_machine.template.scsi_type}",
+                "lifecycle": {
+                    "ignore_changes": [
+                        "custom_attributes",
+                        "tags"
+                    ]
+                },
+                "disk": {
+                    "label": "disk0",
+                    "size": 16,
+                    "unit_number": 0, 
+                    "thin_provisioned": "false",
+                    "path": "[Datastore name] UbantuTest/UbantuTest.vmdk",
+                    "keep_on_remove": "true"
+                }
+            }
+        }
+    }
+}
