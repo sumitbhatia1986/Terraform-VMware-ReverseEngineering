@@ -3,7 +3,7 @@
 # log file wil be at C:\Users\Public\Documents\salt-agent-deploy.log
 # leave this at the top of the script
 param([alias('master')][string]$saltmaster='undefined',[alias('env')]$environment='default',[alias('minionid')][string]$minonname,
-      [string]$ssr="metadata",[string]$notificationemail='creator',[string]$nexusrepo='10.196.184.8:8443',[string]$saltver='3004.2',
+      [string]$ssr="metadata",[string]$notificationemail='creator',[string]$nexusrepo='x.x.x.x:8443',[string]$saltver='3004.2',
       [string]$runjobs="",
       [alias('h')][switch]$help,
       [string]$VER='7.14.0',
@@ -15,10 +15,10 @@ param([alias('master')][string]$saltmaster='undefined',[alias('env')]$environmen
       [switch]$defaults,[switch]$emailalways,[switch]$minimal,
       [switch]$adjoin,[switch]$adreplace,[switch]$bigfix,[switch]$ciscat_eval,[switch]$ciscat_remediation,
       [switch]$firewall_managed,[switch]$flexera,[switch]$hpomi,[switch]$netbackup,
-      [switch]$network_managed,[switch]$qualys,[switch]$slb_certs,
+      [switch]$network_managed,[switch]$qualys,[switch]$xxx_certs,
       [switch]$noadjoin,[switch]$noadreplace,[switch]$noautoaccept,[switch]$nobigfix,[switch]$nociscat_eval,
       [switch]$nociscat_remediation,[switch]$nodefaults,[switch]$nofirewall_managed,[switch]$noflexera,
-      [switch]$nohpomi,[switch]$nonetbackup,[switch]$nonetwork_managed,[switch]$noqualys,[switch]$noslb_certs)
+      [switch]$nohpomi,[switch]$nonetbackup,[switch]$nonetwork_managed,[switch]$noqualys,[switch]$noxxx_certs)
 if ($help){ Get-Help $MyInvocation.MyCommand.Definition ; return }
 
 # this checks to see if this script was called with no parameters
@@ -41,7 +41,7 @@ if ( $PSBoundParameters.Values.Count -eq 0 -and $args.count -eq 0 ){
         $MINIONNAME=''
         # NEXUSREPO is the nexus repo ip and port , leave black to use default
         $NEXUSREPO=''
-        # NOREPO will added hosts entry for slitrepo.it.slb.com to 127.0.0.1
+        # NOREPO will added hosts entry to 127.0.0.1
         # If you set this to True while LOCALREPO is False you will get lots of failures
         # as the Nexus will not be avaialable and you won't have local copies of Agents
         $NOREPO = $False
@@ -50,10 +50,10 @@ if ( $PSBoundParameters.Values.Count -eq 0 -and $args.count -eq 0 ){
         # SALTMASTER is Salt Master Server IP
         # SaltMaster Ip's
         # Dev and Beta are for special cases almost all servers should be in AZR or GCP based on cloud that server is in
-        # SaltDev 10.196.144.208
-        # SaltBeta 10.196.184.9
-        # AZR 10.192.255.36
-        # GCP 10.196.184.4
+        # SaltDev x.x.x.x
+        # SaltBeta x.x.x.x
+        # AZR x.x.x.x
+        # GCP x.x.x.x
         # masterless for masterless salt
         # you need to set an IP hwere for the script to work
         $SALTMASTER = 'x.x.x.x'
@@ -70,11 +70,11 @@ if ( $PSBoundParameters.Values.Count -eq 0 -and $args.count -eq 0 ){
         $hpomi=$False
         $netbackup=$False
         $qualys=$False
-        $slb_certs=$True
+        $xxx_certs=$True
     }
 
 $MINIONNAME_default = $env:COMPUTERNAME.ToLower()
-$NEXUSREPO_default   = '10.196.184.8:8443'
+$NEXUSREPO_default   = 'x.x.x.x:8443'
 $ErrorActionPreference = "Continue"
 $osver = [environment]::OSVersion.Version
 
@@ -201,7 +201,7 @@ if ( ( $defaults -or $stateful -or $postdeployonly ) -and -not $nodefaults -and 
         $netbackup=$True
         $network_managed=$True
         $qualys=$True
-        $slb_certs=$True
+        $xxx_certs=$True
     }
 
     if ($SALTMASTER -eq "masterless" ){
@@ -209,7 +209,7 @@ if ( ( $defaults -or $stateful -or $postdeployonly ) -and -not $nodefaults -and 
         $adreplace=$False
         $network_managed=$True
         $firewall_managed=$True
-        $slb_certs=$True
+        $xxx_certs=$True
         if ( -not $minimal ){
             $bigfix=$True
             $ciscat_eval=$True
@@ -233,7 +233,7 @@ if ( $minimal ){
     #$netbackup=$True
     $network_managed=$True
     #$qualys=$True
-    $slb_certs=$True
+    $xxx_certs=$True
     $postdeployonly=$True
 }
     
@@ -257,7 +257,7 @@ if ( $nohpomi )                { $hpomi = $False }
 if ( $nonetbackup )            { $netbackup = $False }
 if ( $nonetwork_managed )      { $network_managed = $False }
 if ( $noqualys )               { $qualys = $False }
-if ( $noslb_certs )            { $slb_certs = $False }
+if ( $noxxx_certs )            { $xxx_certs = $False }
 
 if ( -not $NEXUSREPO ){ $NEXUSREPO = $NEXUSREPO_default }
 if ( -not $MINIONNAME ){ $MINIONNAME = $MINIONNAME_default}
@@ -280,7 +280,7 @@ if ($SALTMASTER -eq "masterless" ){
 Write-log -level warn "runjobs=$runjobs"
 Write-log -level warn "adjoin=$adjoin adreplace=$adreplace  bigfix=$bigfix ciscat_eval=$ciscat_eval ciscat_remediation=$ciscat_remediation "
 Write-log -level warn "firewall_managed=$firewall_managed flexera=$flexera hpomi=$hpomi netbackup=$netbackup uft=$uft"
-Write-log -level warn "network_managed=$network_managed qualys=$qualys slb_certs=$slb_certs"
+Write-log -level warn "network_managed=$network_managed qualys=$qualys xxx_certs=$xxx_certs"
 
 if ( $SALTMASTER -eq 'x.x.x.x' -or $SALTMASTER -eq 'undefined' -or $SALTMASTER -eq '<master_ip_address>' ) {
     Write-log -level warn "FAILED - master ($SALTMASTER) needs to be assigned a master ip address or set to masterless, please fix and rerun script, exiting script."
@@ -378,7 +378,7 @@ postdeploy:
   qualys: $qualys
   runjobs: '$runjobs'
   saltmanaged: $saltmanaged
-  slb_certs: $slb_certs
+  xxx_certs: $xxx_certs
   ssr: $ssr
   stateful: $STATEFUL
   uft: $uft
@@ -466,8 +466,8 @@ if ($LOCALREPO) {
     }   
 
 if ($NOREPO) {
-        Write-log -level warn $("NOREPO Set Rue, Adding host entry to c:\windows\system32\drivers\etc\hosts for slitrepo.it.slb.com to simulate failure")
-        Add-Content c:\windows\system32\drivers\etc\hosts "127.0.0.1 localhost slitrepo.it.slb.com"
+        Write-log -level warn $("NOREPO Set Rue, Adding host entry to c:\windows\system32\drivers\etc\hosts for xxx.com to simulate failure")
+        Add-Content c:\windows\system32\drivers\etc\hosts "127.0.0.1 localhost xxx.com"
     }
 
 if ($SALTMASTER -eq "masterless") {
