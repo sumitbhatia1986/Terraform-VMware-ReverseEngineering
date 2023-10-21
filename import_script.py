@@ -83,7 +83,6 @@ for child in children:  # for each statement to iterate all names of VMs in the 
 data = OrderedConfig()
 data["provider"] = OrderedConfig()
 data["provider"]["vsphere"] = OrderedConfig()
-data["provider"]["vsphere"]["vsphere_server"] = app_settings['vpshere_server']
 data["provider"]["vsphere"]["user"] = "sampleuser"
 data["provider"]["vsphere"]["password"] = "samplepassword"
 data["provider"]["vsphere"]["allow_unverified_ssl"] = "true"
