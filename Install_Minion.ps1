@@ -1,4 +1,4 @@
-$SALTMASTER = '136.252.235.185' #Required field
+$SALTMASTER = 'x.x.x.x' #Required field
 $MINIONNAME = $env:COMPUTERNAME
 echo $MINIONNAME
 
