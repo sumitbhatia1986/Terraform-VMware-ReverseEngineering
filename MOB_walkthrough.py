@@ -12,12 +12,12 @@ from pyVmomi import vim
 
 app_settings = {
     'api_pass': "xxxxxxx",
-    'api_user': "discover@vsphere.local",
+    'api_user': "administrator@vsphere.local",
     'api_url': "https://x.x.x.x/rest/",
     'vcenter_ip': "x.x.x.x",
-    'VM_name': "GB0922Terra02" ### Desired VM for which we need to find details
-    #'vpshere_server': "199.6.204.64",
-    #'vsphere_datacenter': "LEEDS/DRS"
+    'VM_name': "Test" ### Desired VM for which we need to find details
+    #'vpshere_server': "xx.xx.xx.xx",
+    #'vsphere_datacenter': "Test"
 }
 
 
